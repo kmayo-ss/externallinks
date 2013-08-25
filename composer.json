@@ -1,0 +1,17 @@
+{
+	"name": "kmayo-ss/externallinks",
+	"description": "Adds tracking of external broken links to the SilverStripe CMS",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "broken links", "href"],
+	"authors": [
+		{
+			"name": "Kirk Mayo",
+			"email": "kirk@silverstripe.com"
+		}
+	],
+	"require":
+	{
+		"silverstripe/framework": "3.0.*",
+		"silverstripe/cms": "3.0.*"
+	}
+}
