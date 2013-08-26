@@ -26,7 +26,7 @@ The external links module is a task and ModelAdmin to track and to report on bro
  4. Place this directory in your sites root directory. This is the one with framework and cms in it.
  5. Run in your browser - `/dev/build` to rebuild the database.
  6. You should see a new menu called *Broken Ext. Links*
- 7. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks*
+ 7. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for broken external links
 
 ## Dev task ##
 
