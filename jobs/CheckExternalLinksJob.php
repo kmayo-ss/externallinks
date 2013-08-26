@@ -61,15 +61,16 @@ class CheckExternalLinksJob extends AbstractQueuedJob {
 	}
 
 	public function process() {
-		$task = new CheckExternalLinksTask();
+		$task = new CheckExternalLinks();
 		$task->run();
+		$this->completeJob();
 	}
 
 	/**
 	 * Outputs the completed file to the site's webroot
 	 */
 	protected function completeJob() {
-
+		$this->isComplete = 1;
 		$nextgeneration = new CheckExternalLinksJob();
 		singleton('QueuedJobService')->queueJob($nextgeneration,
 			date('Y-m-d H:i:s', time() + self::$regenerate_time));
