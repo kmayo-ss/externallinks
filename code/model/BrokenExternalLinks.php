@@ -3,7 +3,7 @@
 class BrokenExternalLinks extends DataObject {
 
 	private static $db = array(
-		"Link" => "Varchar(2083)" // 2083 is the maximum length of a URL in Internet Explorer.
+		'Link' => 'Varchar(2083)', // 2083 is the maximum length of a URL in Internet Explorer.
 		'HTTPCode' =>'Int'
 	);
 
