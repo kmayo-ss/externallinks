@@ -63,11 +63,12 @@ class CheckExternalLinks extends BuildTask {
 			}
 		}
 
-		// run this again in 24 hours if queued jobs exists
-		if (class_exists('QueuedJobService')) {
+		// run this again if queued jobs exists and is a valid int
+		$queuedJob = Config::inst()->get('CheckExternalLinks', 'QueuedJob');
+		if (isset($queuedJob) && is_int($queuedJob) && class_exists('QueuedJobService')) {
 			$checkLinks = new CheckExternalLinksJob();
 			singleton('QueuedJobService')
-				->queueJob($checkLinks, date('Y-m-d H:i:s', time() + 86400));
+				->queueJob($checkLinks, date('Y-m-d H:i:s', time() + $queuedJob));
 		}
 
 	}
