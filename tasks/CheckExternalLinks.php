@@ -62,5 +62,13 @@ class CheckExternalLinks extends BuildTask {
 				}
 			}
 		}
+
+		// run this again in 24 hours if queued jobs exists
+		if (class_exists('QueuedJobService')) {
+			$checkLinks = new CheckExternalLinksJob();
+			singleton('QueuedJobService')
+				->queueJob($checkLinks, date('Y-m-d H:i:s', time() + 86400));
+		}
+
 	}
 }
