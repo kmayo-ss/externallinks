@@ -18,7 +18,7 @@ class BrokenExternalLinks extends DataObject {
 	);
 
 	public static $searchable_fields = array(
-		'HTTPCode'
+		'HTTPCode' => array('title' => 'HTTP Code')
 	);
 
 	function canEdit($member = false) {
