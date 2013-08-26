@@ -42,7 +42,7 @@ class CheckExternalLinks extends BuildTask {
 						$brokenLink->HTTPCode = $httpCode;
 						$brokenLink->write();
 
-						// set the broken link class
+						// TODO set the broken link class
 						/*
 						$class = $link->getAttribute('class');
 						$class = ($class) ? $class . 'ss-broken' : 'ss-broken';
