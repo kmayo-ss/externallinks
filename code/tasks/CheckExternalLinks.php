@@ -51,8 +51,8 @@ class CheckExternalLinks extends BuildTask {
 
 						// use raw sql query to set broken link as calling the dataobject write
 						// method will reset the links if no broken internal links are found
-						$query = 'UPDATE SiteTree SET HasBrokenLink = 1 ';	
-						$query .= 'WHERE ID = ' . (int)$page->ID;	
+						$query = "UPDATE \"SiteTree\" SET \"HasBrokenLink\" = 1 ";	
+						$query .= "WHERE \"ID\" = " . (int)$page->ID;	
 						$result = DB::query($query);
 						if (!$result) {
 							// error updating hasBrokenLink
