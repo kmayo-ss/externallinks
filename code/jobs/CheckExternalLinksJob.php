@@ -9,7 +9,7 @@ class CheckExternalLinksJob extends AbstractQueuedJob {
 	public static $regenerate_time = 43200;
 
 	public function __construct() {
-		$this->pagesToProcess = DB::query('SELECT "ID" FROM "SiteTree_Live" WHERE "ShowInSearch"=1')->column();
+		$this->pagesToProcess = SiteTree::get();
 		$this->currentStep = 0;
 		$this->totalSteps = count($this->pagesToProcess);
 	}
@@ -49,7 +49,7 @@ class CheckExternalLinksJob extends AbstractQueuedJob {
 		$restart = $this->currentStep == 0;
 
 		if ($restart) {
-			$this->pagesToProcess = DB::query('SELECT "ID" FROM SiteTree_Live WHERE ShowInSearch=1')->column();
+			$this->pagesToProcess = SiteTree::get();
 		}
 	}
 
@@ -63,6 +63,10 @@ class CheckExternalLinksJob extends AbstractQueuedJob {
 	public function process() {
 		$task = new CheckExternalLinks();
 		$task->run();
+		$data = $this->getJobData();
+		$completedPages = $task->getCompletedPages();
+		$totalPages = $task->getTotalPages();
+		$this->addMessage("$completedPages/$totalPages pages completed");
 		$this->completeJob();
 	}
 

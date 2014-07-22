@@ -38,12 +38,6 @@ Add the following code to the mysite config to run the job every 24 hours (86400
 `Config::inst()->update('CheckExternalLinks', 'QueuedJob', 86400);`
 
 
-## Disable the Broken external link menu
-
-To disable the *Broken Ext. Links* menu add the following code to mysite/_config.php
-
-`CMSMenu::remove_menu_item('BrokenExternalLinksAdmin');`
-
 ## TODO ##
 
 Fix setting the class attribute of broken links to ss-broken
