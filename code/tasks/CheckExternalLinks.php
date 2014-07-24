@@ -60,6 +60,12 @@ class CheckExternalLinks extends BuildTask {
 					if (($httpCode < 200 || $httpCode > 302)
 						|| ($href == '' || $href[0] == '/'))
 					{
+						$brokenLink = new BrokenExternalLinks();
+						$brokenLink->PageID = $page->ID;
+						$brokenLink->Link = $href;
+						$brokenLink->HTTPCode = $httpCode;
+						$brokenLink->write();
+
 						// set the broken link class
 						$class = ($class && stripos($class, 'ss-broken')) ?
 							$class . ' ss-broken' : 'ss-broken';
