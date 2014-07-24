@@ -19,7 +19,11 @@ class CheckExternalLinks extends BuildTask {
 	}
 
 	function run($request) {
-		$pages = Versioned::get_by_stage('SiteTree', 'Live');
+		if (isset($request->ID)) {
+			$pages = $request;
+		} else {
+			$pages = Versioned::get_by_stage('SiteTree', 'Live');
+		}
 		foreach ($pages as $page) {
 			++$this->totalPages;
 
@@ -63,9 +67,10 @@ class CheckExternalLinks extends BuildTask {
 						$htmlValue->__call('saveHTML', array());
 
 						$page->Content = $htmlValue->getContent();
-						$page->write();
+						$page->owner->write();
 
 						if (!$page->HasBrokenLink) {
+
 							// bypass the ORM as syncLinkTracking does not allow you
 							// to update HasBrokenLink to true
 							$query = "UPDATE \"SiteTree_Live\" SET \"HasBrokenLink\" = 1 ";

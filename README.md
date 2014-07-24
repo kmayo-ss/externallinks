@@ -15,7 +15,6 @@ The external links module is a task and ModelAdmin to track and to report on bro
 ## Features
 
 * Add external links to broken links reports
-* Add a model admin for external broken links
 * Add a task to track external broken links
 
 ## Installation
@@ -25,8 +24,7 @@ The external links module is a task and ModelAdmin to track and to report on bro
  3. Make sure the folder after being extracted is named 'externallinks'
  4. Place this directory in your sites root directory. This is the one with framework and cms in it.
  5. Run in your browser - `/dev/build` to rebuild the database.
- 6. You should see a new menu called *Broken Ext. Links*
- 7. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for broken external links
+ 6. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for broken external links
 
 ## Dev task ##
 
@@ -38,6 +36,3 @@ Add the following code to the mysite config to run the job every 24 hours (86400
 `Config::inst()->update('CheckExternalLinks', 'QueuedJob', 86400);`
 
 
-## TODO ##
-
-Fix setting the class attribute of broken links to ss-broken

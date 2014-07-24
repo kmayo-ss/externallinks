@@ -1,82 +1,69 @@
 <?php
 
 /**
- * An check external links job
+ * A Job for running a external link check for published pages
  *
  */
-class CheckExternalLinksJob extends AbstractQueuedJob {
-
-	public static $regenerate_time = 43200;
+class CheckExternalLinksJob extends AbstractQueuedJob implements QueuedJob {
 
 	public function __construct() {
-		$this->pagesToProcess = SiteTree::get();
+		$this->pagesToProcess = Versioned::get_by_stage('SiteTree', 'Live')->column();
 		$this->currentStep = 0;
 		$this->totalSteps = count($this->pagesToProcess);
 	}
 
-	/**
-	 * Sitemap job is going to run for a while...
-	 */
-	public function getJobType() {
-		return QueuedJob::QUEUED;
-	}
-
-	/**
-	 * @return string
-	 */
 	public function getTitle() {
 		return 'Checking external links';
 	}
 
-	/**
-	 * Return a signature for this queued job
-	 * 
-	 * For the generate sitemap job, we only ever want one instance running, so just use the class name
-	 * 
-	 * @return String
-	 */
+	public function getJobType() {
+		return QueuedJob::QUEUED;
+	}
+
 	public function getSignature() {
 		return md5(get_class($this));
 	}
 
-	/**
-	 * Note that this is duplicated for backwards compatibility purposes...
-	 */
-	public function  setup() {
+	public function setup() {
 		parent::setup();
-		increase_time_limit_to();
-
 		$restart = $this->currentStep == 0;
-
 		if ($restart) {
-			$this->pagesToProcess = SiteTree::get();
+			$this->pagesToProcess = Versioned::get_by_stage('SiteTree', 'Live')->column();
+		}
+
+	}
+
+	/**
+	 * Check a individual page
+	 */
+	public function process() {
+		$remainingPages = $this->pagesToProcess;
+		if (!count($remainingPages)) {
+			$this->isComplete = true;
+			return;
+		}
+
+		// lets process our first item - note that we take it off the list of things left to do
+		$ID = array_shift($remainingPages);
+
+		// get the page
+		$page = Versioned::get_by_stage('SiteTree', 'Live', 'ID = '.$ID);
+
+		if (!$page || !$page->Count()) {
+			$this->addMessage("Page ID #$ID could not be found, skipping");
+		}
+
+		$task = new CheckExternalLinks();
+		$task->run($page);
+
+		// and now we store the new list of remaining children
+		$this->pagesToProcess = $remainingPages;
+		$this->currentStep++;
+
+		if (!count($remainingPages)) {
+			$this->isComplete = true;
+			return;
 		}
 	}
 
-	/**
-	 * On any restart, make sure to check that our temporary file is being created still. 
-	 */
-	public function prepareForRestart() {
-		parent::prepareForRestart();
-	}
-
-	public function process() {
-		$task = new CheckExternalLinks();
-		$task->run();
-		$data = $this->getJobData();
-		$completedPages = $task->getCompletedPages();
-		$totalPages = $task->getTotalPages();
-		$this->addMessage("$completedPages/$totalPages pages completed");
-		$this->completeJob();
-	}
-
-	/**
-	 * Outputs the completed file to the site's webroot
-	 */
-	protected function completeJob() {
-		$this->isComplete = 1;
-		$nextgeneration = new CheckExternalLinksJob();
-		singleton('QueuedJobService')->queueJob($nextgeneration,
-			date('Y-m-d H:i:s', time() + self::$regenerate_time));
-	}
 }
