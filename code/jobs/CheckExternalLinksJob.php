@@ -1,5 +1,7 @@
 <?php
 
+if(!class_exists('AbstractQueuedJob')) return;
+
 /**
  * A Job for running a external link check for published pages
  *
@@ -13,7 +15,7 @@ class CheckExternalLinksJob extends AbstractQueuedJob implements QueuedJob {
 	}
 
 	public function getTitle() {
-		return 'Checking external links';
+		return _t('CheckExternalLiksJob.TITLE', 'Checking for external broken links');
 	}
 
 	public function getJobType() {
