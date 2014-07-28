@@ -31,8 +31,10 @@ The external links module is a task and ModelAdmin to track and to report on bro
 Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check your site for external
 broken links.
 If you have the queuedjobs module installed you can set the task to be run every so ofter
-Add the following code to the mysite config to run the job every 24 hours (86400 seconds)
+Add the following yml config to config.yml in mysite/_config have the the task run once every day (86400 seconds)
 
-`Config::inst()->update('CheckExternalLinks', 'QueuedJob', 86400);`
-
-
+`---
+Name: externallinkssettings
+---
+CheckExternalLinks:
+  Delay: 86400`

@@ -1,6 +1,6 @@
 <?php
 
-class BrokenExternalLinks extends DataObject {
+class BrokenExternalLink extends DataObject {
 
 	private static $db = array(
 		'Link' => 'Varchar(2083)', // 2083 is the maximum length of a URL in Internet Explorer.
@@ -25,4 +25,9 @@ class BrokenExternalLinks extends DataObject {
 		return false;
 	}
 
+	function canView($member = false) {
+		$member = $member ? $member : Member::currentUser();
+		$codes = array('content-authors', 'administrators');
+		return Permission::checkMember($member, $codes);
+	}
 }

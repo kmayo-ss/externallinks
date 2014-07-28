@@ -54,13 +54,15 @@ class CheckExternalLinks extends BuildTask {
 				if($href && function_exists('curl_init')) {
 					$handle = curl_init($href);
 					curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
+					curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 5);
+					curl_setopt($handle, CURLOPT_TIMEOUT, 10);
 					$response = curl_exec($handle);
 					$httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);  
 					curl_close($handle);
 					if (($httpCode < 200 || $httpCode > 302)
 						|| ($href == '' || $href[0] == '/'))
 					{
-						$brokenLink = new BrokenExternalLinks();
+						$brokenLink = new BrokenExternalLink();
 						$brokenLink->PageID = $page->ID;
 						$brokenLink->Link = $href;
 						$brokenLink->HTTPCode = $httpCode;
@@ -94,7 +96,7 @@ class CheckExternalLinks extends BuildTask {
 		}
 
 		// run this again if queued jobs exists and is a valid int
-		$queuedJob = Config::inst()->get('CheckExternalLinks', 'QueuedJob');
+		$queuedJob = Config::inst()->get('CheckExternalLinks', 'Delay');
 		if (isset($queuedJob) && is_int($queuedJob) && class_exists('QueuedJobService')) {
 			$checkLinks = new CheckExternalLinksJob();
 			singleton('QueuedJobService')

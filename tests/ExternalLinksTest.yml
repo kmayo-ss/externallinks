@@ -1,0 +1,7 @@
+Page:
+    working:
+        Title: Working Link
+        Content: '<a href="http://127.0.0.1">Localhost</a>'
+    broken:
+        Title: Broken Link
+        Content: '<a href="http://192.0.2.1">Broken</a>'

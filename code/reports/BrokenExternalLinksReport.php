@@ -57,7 +57,7 @@ class BrokenExternalLinksReport extends SS_Report {
 
 	public function sourceRecords() {
 		$returnSet = new ArrayList();
-		$links = BrokenExternalLinks::get();
+		$links = BrokenExternalLink::get();
 		foreach ($links as $link) {
 			$link->PageLink = $link->Page()->Title;
 			$returnSet->push($link);
