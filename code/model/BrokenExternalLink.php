@@ -31,3 +31,13 @@ class BrokenExternalLink extends DataObject {
 		return Permission::checkMember($member, $codes);
 	}
 }
+
+class BrokenExternalPageTrack extends DataObject {
+	private static $db = array(
+		'TrackID' => 'Int'
+	);
+
+	private static $has_one = array(
+		'Page' => 'Page'
+	);
+}

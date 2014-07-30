@@ -56,7 +56,8 @@ class CheckExternalLinksJob extends AbstractQueuedJob implements QueuedJob {
 		}
 
 		$task = new CheckExternalLinks();
-		$task->run($page);
+		$task->pageToProcess = $page;
+		$task->run();
 
 		// and now we store the new list of remaining children
 		$this->pagesToProcess = $remainingPages;

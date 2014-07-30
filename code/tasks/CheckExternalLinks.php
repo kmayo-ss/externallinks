@@ -1,6 +1,7 @@
 <?php
 
 class CheckExternalLinks extends BuildTask {
+	public static $pageToProcess;
 	protected $title = 'Checking broken External links in the SiteTree';
 
 	protected $description = 'A task that records external broken links in the SiteTree';
@@ -10,19 +11,20 @@ class CheckExternalLinks extends BuildTask {
 	private $completedPages;
 	private $totalPages;
 
-	public function getCompletedPages() {
-		return $this->completedPages;
-	}
-
-	public function getTotalPages() {
-		return $this->totalPages;
-	}
-
 	function run($request) {
-		if (isset($request->ID)) {
-			$pages = $request;
+		$trackID = Session::get('ExternalLinksTrackID');
+		if (isset($this->pageToProcess)) {
+			$pages = $this->pageToProcess;
 		} else {
-			$pages = Versioned::get_by_stage('SiteTree', 'Live');
+			if ($trackID) {
+				$result = BrokenExternalPageTrack::get()
+					->filter('TrackID', $trackID);
+				$pages = Versioned::get_by_stage('SiteTree', 'Live')
+					->exclude('ID', $result->column('PageID'))
+					->limit(10);
+			} else {
+				$pages = Versioned::get_by_stage('SiteTree', 'Live');
+			}
 		}
 		foreach ($pages as $page) {
 			++$this->totalPages;
@@ -93,6 +95,12 @@ class CheckExternalLinks extends BuildTask {
 				}
 			}
 			++$this->completedPages;
+			if ($trackID) {
+				$trackPage = new BrokenExternalPageTrack();
+				$trackPage->PageID = $page->ID;
+				$trackPage->TrackID = $trackID;
+				$trackPage->write();
+			}
 		}
 
 		// run this again if queued jobs exists and is a valid int
