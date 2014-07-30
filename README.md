@@ -41,7 +41,17 @@ broken links.
 If you have the queuedjobs module installed you can set the task to be run every so ofter
 Add the following yml config to config.yml in mysite/_config have the the task run once every day (86400 seconds)
 
-```
-CheckExternalLinks:
-  Delay: 86400
-```
+    CheckExternalLinks:
+      Delay: 86400
+
+## Whitelisting codes ##
+
+If you want to ignore or whitelist certain http codes this can be setup via IgnoreCodes in the config.yml
+file in mysite/_config
+
+    CheckExternalLinks:
+      Delay: 60
+      IgnoreCodes:
+        - 401
+        - 403
+        - 501

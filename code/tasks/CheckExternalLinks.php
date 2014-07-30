@@ -61,9 +61,14 @@ class CheckExternalLinks extends BuildTask {
 					$response = curl_exec($handle);
 					$httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);  
 					curl_close($handle);
-					if (($httpCode < 200 || $httpCode > 302)
-						|| ($href == '' || $href[0] == '/'))
-					{
+					// do we have any whitelisted codes
+					$ignoreCodes = Config::inst()->get('CheckExternalLinks', 'IgnoreCodes');
+					// if the code is whitelisted set it to 200
+					$httpCode  = (is_array($ignoreCodes) && in_array($httpCode, $ignoreCodes)) ?
+						200 : $httpCode;
+
+					// ignore empty hrefs and internal links
+					if (($httpCode < 200 || $httpCode > 302) || ($href == '' || $href[0] == '/')) {
 						$brokenLink = new BrokenExternalLink();
 						$brokenLink->PageID = $page->ID;
 						$brokenLink->Link = $href;
