@@ -32,9 +32,19 @@ class BrokenExternalLink extends DataObject {
 	}
 }
 
+class BrokenExternalPageTrackStatus extends DataObject {
+	private static $db = array(
+		'Status' => 'Enum("Completed, Running", "Running")',
+		'TotalPages' => 'Int',
+		'CompletedPages' => 'Int',
+		'JobInfo' => 'Varchar(255)'
+	);
+}
+
 class BrokenExternalPageTrack extends DataObject {
 	private static $db = array(
-		'TrackID' => 'Int'
+		'TrackID' => 'Int',
+		'Processed' => 'Boolean'
 	);
 
 	private static $has_one = array(

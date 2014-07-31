@@ -68,21 +68,21 @@ class BrokenExternalLinksReport extends SS_Report {
 	public function getCMSFields() {
 		Requirements::javascript('externallinks/javascript/BrokenExternalLinksReport.js');
 		$fields = parent::getCMSFields();
-		if (class_exists('AbstractQueuedJob')) {
-			$button = '<button id="externalLinksReport" type="button">%s</button>';
-			$runReportButton = new LiteralField(
-				'runReport',
-				sprintf(
-					$button,
-					_t('ExternalBrokenLinksReport.RUNREPORT', 'Create new report')
-				)
-			);
-			$fields->push($runReportButton);
 
-			$reportResultSpan = '</ br></ br><h3 id="ReportHolder"></h3>';
-			$reportResult = new LiteralField('ResultTitle', $reportResultSpan);
-			$fields->push($reportResult);
-		}
+		$reportResultSpan = '</ br></ br><h3 id="ReportHolder"></h3>';
+		$reportResult = new LiteralField('ResultTitle', $reportResultSpan);
+		$fields->push($reportResult);
+
+		$button = '<button id="externalLinksReport" type="button">%s</button>';
+		$runReportButton = new LiteralField(
+			'runReport',
+			sprintf(
+				$button,
+				_t('ExternalBrokenLinksReport.RUNREPORT', 'Create new report')
+			)
+		);
+		$fields->push($runReportButton);
+
 		return $fields;
 	}
 }

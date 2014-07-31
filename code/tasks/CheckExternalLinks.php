@@ -12,22 +12,62 @@ class CheckExternalLinks extends BuildTask {
 	private $totalPages;
 
 	function run($request) {
-		$trackID = Session::get('ExternalLinksTrackID');
-		if (isset($this->pageToProcess)) {
-			$pages = $this->pageToProcess;
-		} else {
-			if ($trackID) {
-				$result = BrokenExternalPageTrack::get()
-					->filter('TrackID', $trackID);
-				$pages = Versioned::get_by_stage('SiteTree', 'Live')
-					->exclude('ID', $result->column('PageID'))
-					->limit(10);
-			} else {
-				$pages = Versioned::get_by_stage('SiteTree', 'Live');
+		$track = CheckExternalLinks::getLatestTrack();
+
+		// if the script has already been started
+		if ($track && $track->Status == 'Running') {
+			$batch = BrokenExternalPageTrack::get()
+				->filter(array(
+					'TrackID' => $track->ID,
+					'Processed' => 0
+				))->limit(10)->column('PageID');
+			$pages = Versioned::get_by_stage('SiteTree', 'Live')
+				->filter('ID', $batch)
+				->limit(10);
+			$this->updateJobInfo('Fetching pages to check');
+			if ($track->CompletedPages == $track->TotalPages) {
+				$track->Status = 'Completed';
+				$track->write();
+				$this->updateJobInfo('Setting to completed');
 			}
+		// if the script is to be started
+		} else {
+			$pages = Versioned::get_by_stage('SiteTree', 'Live')->column('ID');
+			$noPages = count($pages);
+
+			$track = BrokenExternalPageTrackStatus::create();
+			$track->TotalPages = $noPages;
+			$track->write();
+			$this->updateJobInfo('Creating new tracking object');
+
+			foreach ($pages as $page) {
+				$trackPage = BrokenExternalPageTrack::create();
+				$trackPage->PageID = $page;
+				$trackPage->TrackID = $track->ID;
+				$trackPage->write();
+			}
+
+			$batch = BrokenExternalPageTrack::get()
+				->filter(array(
+					'TrackID' => $track->ID
+				))->limit(10)->column('PageID');
+
+			$pages = Versioned::get_by_stage('SiteTree', 'Live')
+				->filter('ID', $batch);
 		}
+		$trackID = $track->ID;
 		foreach ($pages as $page) {
 			++$this->totalPages;
+
+			if ($track->ID) {
+				$trackPage = BrokenExternalPageTrack::get()
+					->filter(array(
+						'PageID' => $page->ID,
+						'TrackID' => $track->ID
+					))->first();
+				$trackPage->Processed = 1;
+				$trackPage->write();
+			}
 
 			$htmlValue = Injector::inst()->create('HTMLValue', $page->Content);
 			if (!$htmlValue->isValid()) {
@@ -100,12 +140,27 @@ class CheckExternalLinks extends BuildTask {
 				}
 			}
 			++$this->completedPages;
-			if ($trackID) {
-				$trackPage = new BrokenExternalPageTrack();
-				$trackPage->PageID = $page->ID;
-				$trackPage->TrackID = $trackID;
-				$trackPage->write();
+		}
+
+		// run this outside the foreach loop to stop it locking DB rows
+		$this->updateJobInfo('Updating completed pages');
+		$this->updateCompletedPages($trackID);
+
+		// do we need to carry on running the job
+		$track = $this->getLatestTrack();
+		if ($track->CompletedPages >= $track->TotalPages) {
+			$track->Status = 'Completed';
+			$track->write();
+
+			// clear any old previous data
+			$rows = BrokenExternalPageTrack::get()
+				->exclude('TrackID', $track->ID);
+			foreach ($rows as $row) {
+				$row->delete();
 			}
+		} else {
+			$this->updateJobInfo("Running next batch {$track->CompletedPages}/{$track->TotalPages}");
+			$this->run($request);
 		}
 
 		// run this again if queued jobs exists and is a valid int
@@ -115,6 +170,39 @@ class CheckExternalLinks extends BuildTask {
 			singleton('QueuedJobService')
 				->queueJob($checkLinks, date('Y-m-d H:i:s', time() + $queuedJob));
 		}
+	}
 
+	public static function getLatestTrack() {
+		$track = BrokenExternalPageTrackStatus::get()->sort('ID', 'DESC')->first();
+		if (!$track || !$track->exists()) return null;
+		return $track;
+	}
+
+	public static function getLatestTrackID() {
+		$track = CheckExternalLinks::getLatestTrack();
+		if (!$track || !$track->exists()) return null;
+		return $track->ID;
+	}
+
+	public static function getLatestTrackStatus() {
+		$track = CheckExternalLinks::getLatestTrack();
+		if (!$track || !$track->exists()) return null;
+		return $track->Status;
+	}
+
+	private function updateCompletedPages($trackID = 0) {
+		$noPages = BrokenExternalPageTrack::get()
+			->filter(array('TrackID' => $trackID, 'Processed' => 1))->count();
+		$track = $this->getLatestTrack($trackID);
+		$track->CompletedPages = $noPages;
+		$track->write();
+		return $noPages;
+	}
+
+	private function updateJobInfo($message) {
+		$track = CheckExternalLinks::getLatestTrack();
+		if (!$track || !$track->exists()) return null;
+		$track->JobInfo = $message;
+		$track->write();
 	}
 }

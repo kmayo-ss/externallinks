@@ -4,25 +4,28 @@ class ExternalLinks extends FunctionalTest {
 
 	protected static $fixture_file = 'ExternalLinksTest.yml';
 
-	public function testWorkingLink() {
+	public function testLinks() {
 		// uses http://127.0.0.1 to test a working link
-		$page = $this->objFromFixture('Page', 'working');
+		$working = $this->objFromFixture('SiteTree', 'working');
+		$working->publish('Stage', 'Live');
 		$task = new CheckExternalLinks();
-		$task->run($page);
-		$brokenLinks = BrokenExternalLinks::get();
+		$task->run(null);
+		$brokenLinks = BrokenExternalLink::get();
 		$this->assertEquals(0, $brokenLinks->count());
 	}
 
 	public function testBrokenLink() {
 		// uses http://192.0.2.1 for a broken link
-		$page = $this->objFromFixture('Page', 'broken');
+		$broken = $this->objFromFixture('SiteTree', 'broken');
+		$broken->publish('Stage', 'Live');
 		$task = new CheckExternalLinks();
-		$task->run($page);
-		$brokenLinks = BrokenExternalLinks::get();
+		$task->run(null);
+		$brokenLinks = BrokenExternalLink::get();
 		$this->assertEquals(1, $brokenLinks->count());
 	}
 
 	public function testReportExists() {
+		$mock = $this->objFromFixture('SiteTree', 'broken');
 		$reports = SS_Report::get_reports();
 		$reportNames = array();
 		foreach($reports as $report) {
@@ -32,3 +35,4 @@ class ExternalLinks extends FunctionalTest {
 			'BrokenExternalLinksReport is in reports list');
 	}
 }
+

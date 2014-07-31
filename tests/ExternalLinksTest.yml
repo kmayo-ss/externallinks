@@ -1,4 +1,4 @@
-Page:
+SiteTree:
     working:
         Title: Working Link
         Content: '<a href="http://127.0.0.1">Localhost</a>'
