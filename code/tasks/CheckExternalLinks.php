@@ -1,7 +1,8 @@
 <?php
 
 class CheckExternalLinks extends BuildTask {
-	public static $pageToProcess;
+	public $limit = 10;
+
 	protected $title = 'Checking broken External links in the SiteTree';
 
 	protected $description = 'A task that records external broken links in the SiteTree';
@@ -20,10 +21,10 @@ class CheckExternalLinks extends BuildTask {
 				->filter(array(
 					'TrackID' => $track->ID,
 					'Processed' => 0
-				))->limit(10)->column('PageID');
+				))->limit($this->limit)->column('PageID');
 			$pages = Versioned::get_by_stage('SiteTree', 'Live')
 				->filter('ID', $batch)
-				->limit(10);
+				->limit($this->limit);
 			$this->updateJobInfo('Fetching pages to check');
 			if ($track->CompletedPages == $track->TotalPages) {
 				$track->Status = 'Completed';
@@ -50,7 +51,7 @@ class CheckExternalLinks extends BuildTask {
 			$batch = BrokenExternalPageTrack::get()
 				->filter(array(
 					'TrackID' => $track->ID
-				))->limit(10)->column('PageID');
+				))->limit($this->limit)->column('PageID');
 
 			$pages = Versioned::get_by_stage('SiteTree', 'Live')
 				->filter('ID', $batch);
@@ -159,8 +160,13 @@ class CheckExternalLinks extends BuildTask {
 				$row->delete();
 			}
 		} else {
-			$this->updateJobInfo("Running next batch {$track->CompletedPages}/{$track->TotalPages}");
-			$this->run($request);
+			// if running via the queued job module return to the queued job after each iteration
+			if ($this->limit == 1) {
+				return;
+			} else {
+				$this->updateJobInfo("Running next batch {$track->CompletedPages}/{$track->TotalPages}");
+				$this->run($request);
+			}
 		}
 
 		// run this again if queued jobs exists and is a valid int

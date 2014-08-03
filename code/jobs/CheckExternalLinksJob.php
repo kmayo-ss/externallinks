@@ -25,7 +25,14 @@ class CheckExternalLinksJob extends AbstractQueuedJob implements QueuedJob {
 	 */
 	public function process() {
 		$task = new CheckExternalLinks();
-		$task->run();
+		$pages = Versioned::get_by_stage('SiteTree', 'Live');
+		// set the limit so each page is done individually
+		$task->limit = 1;
+		$this->totalSteps = $pages->count();
+		foreach ($pages as $page) {
+			$this->currentStep++;
+			$task->run();
+		}
 		$this->isComplete = true;
 		return;
 	}
