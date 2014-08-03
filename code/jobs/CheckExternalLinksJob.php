@@ -21,20 +21,14 @@ class CheckExternalLinksJob extends AbstractQueuedJob implements QueuedJob {
 	}
 
 	/**
-	 * Check a individual page
+	 * Check an individual page
 	 */
 	public function process() {
 		$task = new CheckExternalLinks();
-		$pages = Versioned::get_by_stage('SiteTree', 'Live');
-		// set the limit so each page is done individually
-		$task->limit = 1;
-		$this->totalSteps = $pages->count();
-		foreach ($pages as $page) {
-			$this->currentStep++;
-			$task->run();
-		}
-		$this->isComplete = true;
-		return;
+		$track = $task->runLinksCheck(1);
+		$this->currentStep = $track->CompletedPages;
+		$this->totalSteps = $track->TotalPages;
+		$this->isComplete = $track->Status === 'Completed';
 	}
 
 }

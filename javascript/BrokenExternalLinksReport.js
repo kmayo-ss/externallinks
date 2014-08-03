@@ -4,6 +4,8 @@
 			$(this).start();
 		},
 		onmatch: function() {
+			// poll the current job and update the front end status
+			$('#externalLinksReport').hide();
 			$(this).poll();
 		},
 		start: function() {
@@ -16,15 +18,16 @@
 			$(this).poll();
 		},
 		poll: function() {
-			// poll the current job and update the front end status
-			$('#externalLinksReport').hide();
 			$.ajax({
 				url: "admin/externallinks/getJobStatus",
 				async: true,
 				success: function(data) {
 					var obj = $.parseJSON(data);
+					
+					// No report, so let user create one
 					if (!obj) {
-						setTimeout(function() { $('#externalLinksReport').poll(); }, 1000);
+						$('#externalLinksReport').show();
+						return;
 					}
 					var completed = obj.Completed ? obj.Completed : 0;
 					var total = obj.Total ? obj.Total : 0;
@@ -46,7 +49,7 @@
 					}
 				},
 				error: function(e) {
-					console.log(e);
+					if(typeof console !== 'undefined') console.log(e);
 				}
 			});
 		}

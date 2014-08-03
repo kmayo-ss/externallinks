@@ -13,6 +13,16 @@ class CheckExternalLinks extends BuildTask {
 	private $totalPages;
 
 	function run($request) {
+		$this->runLinksCheck($this->limit);
+	}
+
+	/**
+	 * Runs the links checker and returns the track used
+	 *
+	 * @param int $limit Limit to number of pages to run
+	 * @return BrokenExternalPageTrackStatus
+	 */
+	public function runLinksCheck($limit) {
 		$track = CheckExternalLinks::getLatestTrack();
 
 		// if the script has already been started
@@ -21,10 +31,10 @@ class CheckExternalLinks extends BuildTask {
 				->filter(array(
 					'TrackID' => $track->ID,
 					'Processed' => 0
-				))->limit($this->limit)->column('PageID');
+				))->limit($limit)->column('PageID');
 			$pages = Versioned::get_by_stage('SiteTree', 'Live')
 				->filter('ID', $batch)
-				->limit($this->limit);
+				->limit($limit);
 			$this->updateJobInfo('Fetching pages to check');
 			if ($track->CompletedPages == $track->TotalPages) {
 				$track->Status = 'Completed';
@@ -51,7 +61,7 @@ class CheckExternalLinks extends BuildTask {
 			$batch = BrokenExternalPageTrack::get()
 				->filter(array(
 					'TrackID' => $track->ID
-				))->limit($this->limit)->column('PageID');
+				))->limit($limit)->column('PageID');
 
 			$pages = Versioned::get_by_stage('SiteTree', 'Live')
 				->filter('ID', $batch);
@@ -159,22 +169,15 @@ class CheckExternalLinks extends BuildTask {
 			foreach ($rows as $row) {
 				$row->delete();
 			}
-		} else {
-			// if running via the queued job module return to the queued job after each iteration
-			if ($this->limit == 1) {
-				return;
-			} else {
-				$this->updateJobInfo("Running next batch {$track->CompletedPages}/{$track->TotalPages}");
-				$this->run($request);
-			}
+			return $track;
 		}
 
-		// run this again if queued jobs exists and is a valid int
-		$queuedJob = Config::inst()->get('CheckExternalLinks', 'Delay');
-		if (isset($queuedJob) && is_int($queuedJob) && class_exists('QueuedJobService')) {
-			$checkLinks = new CheckExternalLinksJob();
-			singleton('QueuedJobService')
-				->queueJob($checkLinks, date('Y-m-d H:i:s', time() + $queuedJob));
+			// if running via the queued job module return to the queued job after each iteration
+		if ($limit == 1) {
+			return $track;
+			} else {
+				$this->updateJobInfo("Running next batch {$track->CompletedPages}/{$track->TotalPages}");
+			return $this->runLinksCheck($limit);
 		}
 	}
 
