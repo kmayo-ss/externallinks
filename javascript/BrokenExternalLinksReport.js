@@ -6,7 +6,7 @@
 		onmatch: function() {
 			// poll the current job and update the front end status
 			$('#externalLinksReport').hide();
-			$(this).poll();
+			$(this).poll(0);
 		},
 		start: function() {
 			// initiate a new job
@@ -15,9 +15,9 @@
 			$('#ReportHolder').append('<span class="ss-ui-loading-icon"></span>');
 			$('#externalLinksReport').hide();
 			$.ajax({url: "admin/externallinks/start", async: true, timeout: 3000 });
-			$(this).poll();
+			$(this).poll(1);
 		},
-		poll: function() {
+		poll: function(start) {
 			$.ajax({
 				url: "admin/externallinks/getJobStatus",
 				async: true,
@@ -32,11 +32,11 @@
 					var completed = obj.Completed ? obj.Completed : 0;
 					var total = obj.Total ? obj.Total : 0;
 					var jobStatus = obj.Status ? obj.Status : 'Running';
-					if (jobStatus == 'Completed') {
+					if (jobStatus == 'Completed' && start == 0) {
 						$('#ReportHolder').text('Report Finished ' + completed + '/' + total);
 						$('#externalLinksReport').show();
 					} else {
-						setTimeout(function() { $('#externalLinksReport').poll(); }, 1000);
+						setTimeout(function() { $('#externalLinksReport').poll(0); }, 1000);
 					}
 					if (total && completed) {
 						if (completed < total) {

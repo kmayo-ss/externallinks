@@ -7,7 +7,7 @@ class ExternalLinks extends FunctionalTest {
 	public function testLinks() {
 		// uses http://127.0.0.1 to test a working link
 		$working = $this->objFromFixture('SiteTree', 'working');
-		$working->publish('Stage', 'Stage');
+		$working->write();
 		$task = new CheckExternalLinks();
 		$task->run(null);
 		$brokenLinks = BrokenExternalLink::get()->column('Link');;
@@ -18,7 +18,7 @@ class ExternalLinks extends FunctionalTest {
 	public function testBrokenLink() {
 		// uses http://192.0.2.1 for a broken link
 		$broken = $this->objFromFixture('SiteTree', 'broken');
-		$broken->publish('Stage', 'Stage');
+		$broken->write();
 		$task = new CheckExternalLinks();
 		$task->run(null);
 		$brokenLinks = BrokenExternalLink::get();

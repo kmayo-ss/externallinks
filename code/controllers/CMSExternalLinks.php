@@ -31,6 +31,21 @@ class CMSExternalLinks_Controller extends Controller {
 			return;
 		}
 		if (class_exists('QueuedJobService')) {
+			$pages = Versioned::get_by_stage('SiteTree', 'Stage');
+			$noPages = count($pages);
+
+			$track = BrokenExternalPageTrackStatus::create();
+			$track->TotalPages = $noPages;
+			$track->Status = 'Running';
+			$track->write();
+
+			foreach ($pages as $page) {
+				$trackPage = BrokenExternalPageTrack::create();
+				$trackPage->PageID = $page->ID;
+				$trackPage->TrackID = $track->ID;
+				$trackPage->write();
+			}
+
 			$checkLinks = new CheckExternalLinksJob();
 			singleton('QueuedJobService')
 				->queueJob($checkLinks, date('Y-m-d H:i:s', time() + 1));
