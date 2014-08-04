@@ -32,7 +32,7 @@ class CheckExternalLinks extends BuildTask {
 					'TrackID' => $track->ID,
 					'Processed' => 0
 				))->limit($limit)->column('PageID');
-			$pages = Versioned::get_by_stage('SiteTree', 'Live')
+			$pages = Versioned::get_by_stage('SiteTree', 'Stage')
 				->filter('ID', $batch)
 				->limit($limit);
 			$this->updateJobInfo('Fetching pages to check');
@@ -43,7 +43,7 @@ class CheckExternalLinks extends BuildTask {
 			}
 		// if the script is to be started
 		} else {
-			$pages = Versioned::get_by_stage('SiteTree', 'Live')->column('ID');
+			$pages = Versioned::get_by_stage('SiteTree', 'Stage')->column('ID');
 			$noPages = count($pages);
 
 			$track = BrokenExternalPageTrackStatus::create();
@@ -63,7 +63,7 @@ class CheckExternalLinks extends BuildTask {
 					'TrackID' => $track->ID
 				))->limit($limit)->column('PageID');
 
-			$pages = Versioned::get_by_stage('SiteTree', 'Live')
+			$pages = Versioned::get_by_stage('SiteTree', 'Stage')
 				->filter('ID', $batch);
 		}
 		$trackID = $track->ID;
@@ -139,7 +139,7 @@ class CheckExternalLinks extends BuildTask {
 
 							// bypass the ORM as syncLinkTracking does not allow you
 							// to update HasBrokenLink to true
-							$query = "UPDATE \"SiteTree_Live\" SET \"HasBrokenLink\" = 1 ";
+							$query = "UPDATE \"SiteTree\" SET \"HasBrokenLink\" = 1 ";
 							$query .= "WHERE \"ID\" = " . (int)$page->ID;   
 							$result = DB::query($query);
 							if (!$result) {
