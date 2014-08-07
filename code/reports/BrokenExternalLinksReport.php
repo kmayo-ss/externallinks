@@ -9,42 +9,40 @@
 class BrokenExternalLinksReport extends SS_Report {
 
 	/**
-	 * Columns in the report
-	 * 
-	 * @var array
-	 * @config
-	 */
-	private static $columns = array(
-		'Created' => 'Checked',
-		'Link' => 'External Link',
-		'HTTPCode' => 'HTTP Error Code',
-		'PageLink' => array(
-			'title' => 'Page link is on',
-			'link' => true
-		),	
-	);
-
-	public function init() {
-		parent::init();	
-	}
-
-	/**
 	 * Returns the report title
-	 * 
+	 *
 	 * @return string
 	 */
 	public function title() {
-		return _t('ExternalBrokenLinksReport.EXTERNALBROKENLINKS',
-			"External broken links report");
+		return _t('ExternalBrokenLinksReport.EXTERNALBROKENLINKS', "External broken links report");
 	}
 
-	/**
-	 * Returns the column names of the report
-	 * 
-	 * @return array
-	 */
 	public function columns() {
-		return self::$columns;
+		return array(
+			"Created" => "Checked",
+			'Link' => array(
+				'title' => 'External Link',
+				'formatting' => function($value, $item) {
+					return sprintf(
+						'<a target="_blank" href="%s">%s</a>',
+						Convert::raw2att($item->Link),
+						Convert::raw2xml($item->Link)
+					);
+				}
+			),
+			'HTTPCode' => 'HTTP Error Code',
+			"Title" => array(
+				"title" => 'Page link is on',
+				'formatting' => function($value, $item) {
+					$page = $item->Page();
+					return sprintf(
+						'<a href="%s">%s</a>',
+						Convert::raw2att($page->CMSEditLink()),
+						Convert::raw2xml($page->Title)
+					);
+				}
+			)
+		);
 	}
 
 	/**
@@ -57,20 +55,9 @@ class BrokenExternalLinksReport extends SS_Report {
 	}
 
 	public function sourceRecords() {
-		$track = CheckExternalLinks::getLatestTrack();
-		$returnSet = new ArrayList();
-		if ($track && $track->exists()) {
-			$links = BrokenExternalLink::get()
-				->filter('TrackID', $track->ID);
-		} else {
-			$links = BrokenExternalLink::get();
-		}
-		foreach ($links as $link) {
-			$link->PageLink = $link->Page()->Title;
-			$link->ID = $link->Page()->ID;
-			$returnSet->push($link);
-		}
-		return $returnSet;
+		$track = BrokenExternalPageTrackStatus::get_latest();
+		if ($track) return $track->BrokenLinks();
+		return new ArrayList();
 	}
 
 	public function getCMSFields() {

@@ -24,7 +24,7 @@ class CheckExternalLinksJob extends AbstractQueuedJob implements QueuedJob {
 	 * Check an individual page
 	 */
 	public function process() {
-		$task = new CheckExternalLinks();
+		$task = CheckExternalLinksTask::create();
 		$track = $task->runLinksCheck(1);
 		$this->currentStep = $track->CompletedPages;
 		$this->totalSteps = $track->TotalPages;

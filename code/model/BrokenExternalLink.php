@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Represents a single link checked for a single run that is broken
+ *
+ * @method BrokenExternalPageTrack Track()
+ * @method BrokenExternalPageTrackStatus Status()
+ */
 class BrokenExternalLink extends DataObject {
 
 	private static $db = array(
@@ -8,9 +14,16 @@ class BrokenExternalLink extends DataObject {
 	);
 
 	private static $has_one = array(
-		'Page' => 'Page',
-		'Track' => 'BrokenExternalLink'
+		'Track' => 'BrokenExternalPageTrack',
+		'Status' => 'BrokenExternalPageTrackStatus'
 	);
+
+	/**
+	 * @return SiteTree
+	 */
+	public function Page() {
+		return $this->Track()->Page();
+	}
 
 	public static $summary_fields = array(
 		'Page.Title' => 'Page',
@@ -33,22 +46,4 @@ class BrokenExternalLink extends DataObject {
 	}
 }
 
-class BrokenExternalPageTrackStatus extends DataObject {
-	private static $db = array(
-		'Status' => 'Enum("Completed, Running", "Running")',
-		'TotalPages' => 'Int',
-		'CompletedPages' => 'Int',
-		'JobInfo' => 'Varchar(255)'
-	);
-}
 
-class BrokenExternalPageTrack extends DataObject {
-	private static $db = array(
-		'TrackID' => 'Int',
-		'Processed' => 'Boolean'
-	);
-
-	private static $has_one = array(
-		'Page' => 'Page'
-	);
-}

@@ -9,10 +9,13 @@
 			"email": "kirk@silverstripe.com"
 		}
 	],
-	"require":
-	{
+	"require": {
 		"silverstripe/framework": ">=3.0",
 		"silverstripe/cms": ">=3.0"
+	},
+	"require-dev": {
+		"hafriedlander/silverstripe-phockito": "*",
+		"phpunit/PHPUnit": "~3.7@stable"
 	},
 	"suggest": {
 		"silverstripe/queuedjobs": "Speeds up running the job for Content Editors fropm the report"

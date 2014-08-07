@@ -10,13 +10,21 @@ class CMSExternalLinks_Controller extends Controller {
 	 * @return string JSON string detailing status of the job
 	 */
 	public function getJobStatus() {
-		$track = CheckExternalLinks::getLatestTrack();
-		if (!$track || !$track->exists()) return null;
-		echo json_encode(array(
+		// Set headers
+		HTTP::set_cache_age(0);
+		HTTP::add_cache_headers($this->response);
+		$this->response
+			->addHeader('Content-Type', 'application/json')
+			->addHeader('Content-Encoding', 'UTF-8')
+			->addHeader('X-Content-Type-Options', 'nosniff');
+
+		// Format status
+		$track = BrokenExternalPageTrackStatus::get_latest();
+		if($track) return json_encode(array(
 			'TrackID' => $track->ID,
 			'Status' => $track->Status,
-			'Completed' => $track->CompletedPages,
-			'Total' => $track->TotalPages
+			'Completed' => $track->getCompletedPages(),
+			'Total' => $track->getTotalPages()
 		));
 	}
 
@@ -25,36 +33,22 @@ class CMSExternalLinks_Controller extends Controller {
 	 * Starts a broken external link check
 	 */
 	public function start() {
-		$status = checkExternalLinks::getLatestTrackStatus();
 		// return if the a job is already running
-		if ($status == 'Running') {
-			return;
-		}
+		$status = BrokenExternalPageTrackStatus::get_latest();
+		if ($status && $status->Status == 'Running') return;
+
+		// Create a new job
 		if (class_exists('QueuedJobService')) {
-			$pages = Versioned::get_by_stage('SiteTree', 'Stage');
-			$noPages = count($pages);
-
-			$track = BrokenExternalPageTrackStatus::create();
-			$track->TotalPages = $noPages;
-			$track->Status = 'Running';
-			$track->write();
-
-			foreach ($pages as $page) {
-				$trackPage = BrokenExternalPageTrack::create();
-				$trackPage->PageID = $page->ID;
-				$trackPage->TrackID = $track->ID;
-				$trackPage->write();
-			}
-
+			// Force the creation of a new run
+			BrokenExternalPageTrackStatus::create_status();
 			$checkLinks = new CheckExternalLinksJob();
-			singleton('QueuedJobService')
-				->queueJob($checkLinks, date('Y-m-d H:i:s', time() + 1));
+			singleton('QueuedJobService')->queueJob($checkLinks);
 		} else {
 			//TODO this hangs as it waits for the connection to be released
-			// should return back and continue processing	
+			// should return back and continue processing
 			// http://us3.php.net/manual/en/features.connection-handling.php
-			$task = new CheckExternalLinks();
-			$task->run();
+			$task = CheckExternalLinksTask::create();
+			$task->runLinksCheck();
 		}
 	}
 }
