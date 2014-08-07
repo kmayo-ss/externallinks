@@ -1,5 +1,7 @@
 # External links
 
+[![Build Status](https://travis-ci.org/silverstripe-labs/silverstripe-externallinks.svg?branch=master)](https://travis-ci.org/silverstripe-labs/silverstripe-externallinks)
+
 ## Introduction
 
 The external links module is a task and ModelAdmin to track and to report on broken external links.
@@ -10,7 +12,7 @@ The external links module is a task and ModelAdmin to track and to report on bro
 
 ## Requirements
 
-	* SilverStripe 3.0 +
+	* SilverStripe 3.1 +
 
 ## Features
 
@@ -19,12 +21,11 @@ The external links module is a task and ModelAdmin to track and to report on bro
 
 ## Installation
 
- 1. Download the module form GitHub (Composer support to be added)
- 2. Extract the file (if you are on windows try 7-zip for extracting tar.gz files
- 3. Make sure the folder after being extracted is named 'externallinks'
- 4. Place this directory in your sites root directory. This is the one with framework and cms in it.
- 5. Run in your browser - `/dev/build` to rebuild the database.
- 6. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for broken external links
+ 1. If you have composer you can use `composer require silverstripe/externallinks:*`. Otherwise, 
+    download the module from GitHub and extract to the 'externallinks' folder. Place this directory
+    in your sites root directory. This is the one with framework and cms in it.
+ 2. Run in your browser - `/dev/build` to rebuild the database.
+ 3. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for broken external links
 
 ## Report ##
 
