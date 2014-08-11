@@ -34,8 +34,7 @@ class BrokenExternalLinksReport extends SS_Report {
 	 * @return string
 	 */
 	public function title() {
-		return _t('ExternalBrokenLinksReport.EXTERNALBROKENLINKS',
-			"External broken links report");
+		return _t('ExternalBrokenLinksReport.EXTERNALBROKENLINKS',"External broken links report");
 	}
 
 	/**
@@ -57,14 +56,8 @@ class BrokenExternalLinksReport extends SS_Report {
 	}
 
 	public function sourceRecords() {
-		$track = CheckExternalLinks::getLatestTrack();
 		$returnSet = new ArrayList();
-		if ($track && $track->exists()) {
-			$links = BrokenExternalLink::get()
-				->filter('TrackID', $track->ID);
-		} else {
-			$links = BrokenExternalLink::get();
-		}
+		$links = BrokenExternalLink::get();
 		foreach ($links as $link) {
 			$link->PageLink = $link->Page()->Title;
 			$link->ID = $link->Page()->ID;

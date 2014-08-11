@@ -124,7 +124,6 @@ class CheckExternalLinks extends BuildTask {
 						$brokenLink->PageID = $page->ID;
 						$brokenLink->Link = $href;
 						$brokenLink->HTTPCode = $httpCode;
-						$brokenLink->TrackID = $track->ID;
 						$brokenLink->write();
 
 						// set the broken link class
