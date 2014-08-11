@@ -13,5 +13,8 @@
 	{
 		"silverstripe/framework": ">=3.0",
 		"silverstripe/cms": ">=3.0"
+	},
+	"suggest": {
+		"silverstripe/queuedjobs": "Speeds up running the job for Content Editors fropm the report"
 	}
 }

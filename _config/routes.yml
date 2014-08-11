@@ -1,0 +1,7 @@
+---
+Name: externallink
+After: framework/routes
+---
+Director:
+  rules:
+    'admin/externallinks//$Action': 'CMSExternalLinks_Controller'
