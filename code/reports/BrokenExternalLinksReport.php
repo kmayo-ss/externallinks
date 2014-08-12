@@ -30,7 +30,7 @@ class BrokenExternalLinksReport extends SS_Report {
 					);
 				}
 			),
-			'HTTPCode' => 'HTTP Error Code',
+			'HTTPCodeDescription' => 'HTTP Error Code',
 			"Title" => array(
 				"title" => 'Page link is on',
 				'formatting' => function($value, $item) {

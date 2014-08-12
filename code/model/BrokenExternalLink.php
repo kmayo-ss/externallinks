@@ -27,7 +27,7 @@ class BrokenExternalLink extends DataObject {
 
 	public static $summary_fields = array(
 		'Page.Title' => 'Page',
-		'HTTPCode' => 'HTTP Code',
+		'HTTPCodeDescription' => 'HTTP Code',
 		'Created' => 'Created'
 	);
 
@@ -35,14 +35,35 @@ class BrokenExternalLink extends DataObject {
 		'HTTPCode' => array('title' => 'HTTP Code')
 	);
 
-	function canEdit($member = false) {
+	public function canEdit($member = false) {
 		return false;
 	}
 
-	function canView($member = false) {
+	public function canView($member = false) {
 		$member = $member ? $member : Member::currentUser();
 		$codes = array('content-authors', 'administrators');
 		return Permission::checkMember($member, $codes);
+	}
+
+	/**
+	 * Retrieve a human readable description of a response code
+	 *
+	 * @return string
+	 */
+	public function getHTTPCodeDescription() {
+		$code = $this->HTTPCode;
+		if(empty($code)) {
+			// Assume that $code = 0 means there was no response
+			$description = _t(__CLASS__.'.NOTAVAILABLE', 'Server Not Available');
+		} elseif(
+			($descriptions = Config::inst()->get('SS_HTTPResponse', 'status_codes'))
+			&& isset($descriptions[$code])
+		) {
+			$description = $descriptions[$code];
+		} else {
+			$description = _t(__CLASS__.'.UNKNOWNRESPONSE', 'Unknown Response Code');
+		}
+		return sprintf("%d (%s)", $code, $description);
 	}
 }
 
