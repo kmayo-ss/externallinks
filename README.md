@@ -25,12 +25,34 @@ The external links module is a task and ModelAdmin to track and to report on bro
     download the module from GitHub and extract to the 'externallinks' folder. Place this directory
     in your sites root directory. This is the one with framework and cms in it.
  2. Run in your browser - `/dev/build` to rebuild the database.
- 3. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for broken external links
+ 3. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for
+    broken external links
 
 ## Report ##
 
-A new report is added called 'External Broken links report' from here you can also start a new job which is run
-via AJAX and in batches of 10 so it can be run via content editors who do not have access to jobs or tasks.
+A new report is added called 'External Broken links report'. When viewing this report, a user may press
+the "Create new report" button which will trigger an ajax request to initiate a report run.
+
+In this initial ajax request this module will do one of two things, depending on which modules are included:
+
+* If the queuedjobs module is installed, a new queued job will be initiated. The queuedjobs module will then
+  manage the progress of the task.
+* If the queuedjobs module is absent, then the controller will fallback to running a buildtask in the background.
+  This is less robust, as a failure or error during this process will abort the run.
+
+In either case, the background task will loop over every page in the system, inspecting all external urls and
+checking the status code returned by requesting each one. If a URL returns a response code that is considered
+"broken" (defined as < 200 or > 302) then the `ss-broken` css class will be assigned to that url, and 
+a line item will be added to the report. If a previously broken link has been corrected or fixed, then
+this class is removed.
+
+In the actual report generated the user can click on any broken link item to either view the link in their browser,
+or edit the containing page in the CMS.
+
+While a report is running the current status of this report will be displayed on the report details page, along
+with the status. The user may leave this page and return to it later to view the ongoing status of this report.
+
+Any subsequent report may not be generated until a prior report has completed.
 
 ## Dev task ##
 
