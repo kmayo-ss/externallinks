@@ -118,6 +118,16 @@ class ExternalLinksTest extends SapphireTest {
 		);
 		$actual = $links->map('Link', 'HTTPCode')->toArray();
 		$this->assertEquals($expected, $actual);
+
+		// Check response descriptions are correct
+		i18n::set_locale('en_NZ');
+		$expected = array(
+			'http://www.broken.com' => '403 (Forbidden)',
+			'http://www.broken.com/url/thing' => '404 (Not Found)',
+			'http://www.nodomain.com' => '0 (Server Not Available)'
+		);
+		$actual = $links->map('Link', 'HTTPCodeDescription')->toArray();
+		$this->assertEquals($expected, $actual);
 	}
 
 	/**
