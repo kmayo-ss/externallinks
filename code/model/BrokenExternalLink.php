@@ -18,23 +18,23 @@ class BrokenExternalLink extends DataObject {
 		'Status' => 'BrokenExternalPageTrackStatus'
 	);
 
-	/**
-	 * @return SiteTree
-	 */
-	public function Page() {
-		return $this->Track()->Page();
-	}
-
-	public static $summary_fields = array(
+	private static $summary_fields = array(
 		'Created' => 'Checked',
 		'Link' => 'External Link',
 		'HTTPCodeDescription' => 'HTTP Error Code',
 		'Page.Title' => 'Page link is on'
 	);
 
-	public static $searchable_fields = array(
+	private static $searchable_fields = array(
 		'HTTPCode' => array('title' => 'HTTP Code')
 	);
+
+	/**
+	 * @return SiteTree
+	 */
+	public function Page() {
+		return $this->Track()->Page();
+	}
 
 	public function canEdit($member = false) {
 		return false;
