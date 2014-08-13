@@ -26,9 +26,10 @@ class BrokenExternalLink extends DataObject {
 	}
 
 	public static $summary_fields = array(
-		'Page.Title' => 'Page',
-		'HTTPCodeDescription' => 'HTTP Code',
-		'Created' => 'Created'
+		'Created' => 'Checked',
+		'Link' => 'External Link',
+		'HTTPCodeDescription' => 'HTTP Error Code',
+		'Page.Title' => 'Page link is on'
 	);
 
 	public static $searchable_fields = array(
