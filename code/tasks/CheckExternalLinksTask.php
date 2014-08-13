@@ -2,6 +2,26 @@
 
 class CheckExternalLinksTask extends BuildTask {
 
+	private static $dependencies = array(
+		'LinkChecker' => '%$LinkChecker'
+	);
+
+	/**
+	 * @var bool
+	 */
+	protected $silent = false;
+
+	/**
+	 * @var LinkChecker
+	 */
+	protected $linkChecker;
+
+	protected $title = 'Checking broken External links in the SiteTree';
+
+	protected $description = 'A task that records external broken links in the SiteTree';
+
+	protected $enabled = true;
+
 	/**
 	 * Log a message
 	 *
@@ -11,11 +31,9 @@ class CheckExternalLinksTask extends BuildTask {
 		if(!$this->silent) Debug::message($message);
 	}
 
-	/**
-	 * @var bool
-	 */
-	protected $silent = false;
-
+	public function run($request) {
+		$this->runLinksCheck();
+	}
 	/**
 	 * Turn on or off message output
 	 *
@@ -24,25 +42,6 @@ class CheckExternalLinksTask extends BuildTask {
 	public function setSilent($silent) {
 		$this->silent = $silent;
 	}
-
-	protected $title = 'Checking broken External links in the SiteTree';
-
-	protected $description = 'A task that records external broken links in the SiteTree';
-
-	protected $enabled = true;
-
-	private static $dependencies = array(
-		'LinkChecker' => '%$LinkChecker'
-	);
-
-	public function run($request) {
-		$this->runLinksCheck();
-	}
-
-	/**
-	 * @var LinkChecker
-	 */
-	protected $linkChecker;
 
 	/**
 	 * @param LinkChecker $linkChecker
@@ -57,7 +56,6 @@ class CheckExternalLinksTask extends BuildTask {
 	public function getLinkChecker() {
 		return $this->linkChecker;
 	}
-
 
 	/**
 	 * Check the status of a single link on a page
@@ -167,20 +165,6 @@ class CheckExternalLinksTask extends BuildTask {
 		return $status;
 	}
 
-	public static function getLatestTrack() {
-		return BrokenExternalPageTrackStatus::get_latest();
-	}
-
-	public static function getLatestTrackID() {
-		$track = BrokenExternalPageTrackStatus::get_latest();
-		return $track ? $track->ID : null;
-	}
-
-	public static function getLatestTrackStatus() {
-		$track = BrokenExternalPageTrackStatus::get_latest();
-		return $track ? $track->Status : null;
-	}
-
 	private function updateCompletedPages($trackID = 0) {
 		$noPages = BrokenExternalPageTrack::get()
 			->filter(array(
@@ -188,7 +172,7 @@ class CheckExternalLinksTask extends BuildTask {
 				'Processed' => 1
 			))
 			->count();
-		$track = $this->getLatestTrack($trackID);
+		$track = BrokenExternalPageTrackStatus::get_latest();
 		$track->CompletedPages = $noPages;
 		$track->write();
 		return $noPages;
