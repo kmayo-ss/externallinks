@@ -24,7 +24,7 @@ class CurlLinkChecker implements LinkChecker {
 	 * @param string $href URL to check
 	 * @return int HTTP status code, or null if not checkable (not a link)
 	 */
-	protected function checkLink($href) {
+	public function checkLink($href) {
 		// Skip non-external links
 		if(!preg_match('/^https?[^:]*:\/\//', $href)) return null;
 
