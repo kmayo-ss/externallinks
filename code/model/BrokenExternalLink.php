@@ -55,14 +55,14 @@ class BrokenExternalLink extends DataObject {
 		$code = $this->HTTPCode;
 		if(empty($code)) {
 			// Assume that $code = 0 means there was no response
-			$description = _t(__CLASS__.'.NOTAVAILABLE', 'Server Not Available');
+			$description = _t('BrokenExternalLink.NOTAVAILABLE', 'Server Not Available');
 		} elseif(
 			($descriptions = Config::inst()->get('SS_HTTPResponse', 'status_codes'))
 			&& isset($descriptions[$code])
 		) {
 			$description = $descriptions[$code];
 		} else {
-			$description = _t(__CLASS__.'.UNKNOWNRESPONSE', 'Unknown Response Code');
+			$description = _t('BrokenExternalLink.UNKNOWNRESPONSE', 'Unknown Response Code');
 		}
 		return sprintf("%d (%s)", $code, $description);
 	}
