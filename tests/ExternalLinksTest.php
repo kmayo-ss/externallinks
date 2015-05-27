@@ -1,7 +1,5 @@
 <?php
 
-if (class_exists('Phockito')) Phockito::include_hamcrest();
-
 class ExternalLinksTest extends SapphireTest {
 
 	protected static $fixture_file = 'ExternalLinksTest.yml';
@@ -9,6 +7,14 @@ class ExternalLinksTest extends SapphireTest {
 	protected $extraDataObjects = array(
 		'ExternalLinksTest_Page'
 	);
+
+	public function setUpOnce() {
+		if (class_exists('Phockito')) {
+			Phockito::include_hamcrest(false);
+		}
+
+		parent::setUpOnce();
+	}
 
 	public function setUp() {
 		parent::setUp();
@@ -60,7 +66,7 @@ class ExternalLinksTest extends SapphireTest {
 			->return(null);
 
 		Phockito::when($checker)
-			->checkLink(anything()) // anything else is 404
+			->checkLink(Hamcrest_Matchers::anything()) // anything else is 404
 			->return(404);
 
 		Injector::inst()->registerService($checker, 'LinkChecker');
