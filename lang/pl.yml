@@ -2,7 +2,7 @@ pl:
   BrokenExternalLink:
     NOTAVAILABLE: 'Serwer niedostępny'
     PLURALNAME: 'Uszkodzone linki zewnętrzne'
-    SINGULARNAME: 'Uszkodzony link zewnętrzny'    
+    SINGULARNAME: 'Uszkodzony link zewnętrzny'
     UNKNOWNRESPONSE: 'Nieznany kod odpowiedzi'
   BrokenExternalPageTrack:
     PLURALNAME: 'Wykrywania wadliwych stron zewnętrznych'
