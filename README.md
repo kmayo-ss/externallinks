@@ -8,7 +8,7 @@ The external links module is a task and ModelAdmin to track and to report on bro
 
 ## Maintainer Contact
 
-	* Kirk Mayo kirk (at) silverstripe (dot) com
+ * Damian Mooyman (@tractorcow) <damian@silverstripe.com>
 
 ## Requirements
 
@@ -18,6 +18,8 @@ The external links module is a task and ModelAdmin to track and to report on bro
 
 * Add external links to broken links reports
 * Add a task to track external broken links
+
+See the [changelog](CHANGELOG.md) for version history.
 
 ## Installation
 
