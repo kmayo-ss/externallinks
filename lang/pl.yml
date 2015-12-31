@@ -1,0 +1,17 @@
+pl:
+  BrokenExternalLink:
+    NOTAVAILABLE: 'Serwer niedostępny'
+    PLURALNAME: 'Uszkodzone linki zewnętrzne'
+    SINGULARNAME: 'Uszkodzony link zewnętrzny'
+    UNKNOWNRESPONSE: 'Nieznany kod odpowiedzi'
+  BrokenExternalPageTrack:
+    PLURALNAME: 'Wykrywania wadliwych stron zewnętrznych'
+    SINGULARNAME: 'Wykrywanie wadliwych stron zewnętrznych'
+  BrokenExternalPageTrackStatus:
+    PLURALNAME: 'Statusy wykrywania wadliwych stron zewnętrznych'
+    SINGULARNAME: 'Status wykrywania wadliwych stron zewnętrznych'
+  CheckExternalLiksJob:
+    TITLE: 'Wyszukiwanie uszkodzonych linków zewnętrznych'
+  ExternalBrokenLinksReport:
+    EXTERNALBROKENLINKS: 'Raport uszkodzonych linków zewnętrznych'
+    RUNREPORT: 'Stwórz nowy raport'
