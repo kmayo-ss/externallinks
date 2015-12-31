@@ -1,0 +1,17 @@
+en:
+  BrokenExternalLink:
+    NOTAVAILABLE: 'Server Not Available'
+    PLURALNAME: 'Broken External Links'
+    SINGULARNAME: 'Broken External Link'
+    UNKNOWNRESPONSE: 'Unknown Response Code'
+  BrokenExternalPageTrack:
+    PLURALNAME: 'Broken External Page Tracks'
+    SINGULARNAME: 'Broken External Page Track'
+  BrokenExternalPageTrackStatus:
+    PLURALNAME: 'Broken External Page Track Statuss'
+    SINGULARNAME: 'Broken External Page Track Status'
+  CheckExternalLiksJob:
+    TITLE: 'Checking for external broken links'
+  ExternalBrokenLinksReport:
+    EXTERNALBROKENLINKS: 'External broken links report'
+    RUNREPORT: 'Create new report'

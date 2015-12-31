@@ -1,49 +1,82 @@
 # External links
 
+[![Build Status](https://travis-ci.org/silverstripe-labs/silverstripe-externallinks.svg?branch=master)](https://travis-ci.org/silverstripe-labs/silverstripe-externallinks)
+
 ## Introduction
 
 The external links module is a task and ModelAdmin to track and to report on broken external links.
 
 ## Maintainer Contact
 
-	* Kirk Mayo kirk (at) silverstripe (dot) com
+ * Damian Mooyman (@tractorcow) <damian@silverstripe.com>
 
 ## Requirements
 
-	* SilverStripe 3.0 +
+	* SilverStripe 3.1 +
 
 ## Features
 
 * Add external links to broken links reports
-* Add a model admin for external broken links
 * Add a task to track external broken links
+
+See the [changelog](CHANGELOG.md) for version history.
 
 ## Installation
 
- 1. Download the module form GitHub (Composer support to be added)
- 2. Extract the file (if you are on windows try 7-zip for extracting tar.gz files
- 3. Make sure the folder after being extracted is named 'externallinks'
- 4. Place this directory in your sites root directory. This is the one with framework and cms in it.
- 5. Run in your browser - `/dev/build` to rebuild the database.
- 6. You should see a new menu called *Broken Ext. Links*
- 7. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for broken external links
+ 1. If you have composer you can use `composer require silverstripe/externallinks:*`. Otherwise, 
+    download the module from GitHub and extract to the 'externallinks' folder. Place this directory
+    in your sites root directory. This is the one with framework and cms in it.
+ 2. Run in your browser - `/dev/build` to rebuild the database.
+ 3. Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check for
+    broken external links
+
+## Report ##
+
+A new report is added called 'External Broken links report'. When viewing this report, a user may press
+the "Create new report" button which will trigger an ajax request to initiate a report run.
+
+In this initial ajax request this module will do one of two things, depending on which modules are included:
+
+* If the queuedjobs module is installed, a new queued job will be initiated. The queuedjobs module will then
+  manage the progress of the task.
+* If the queuedjobs module is absent, then the controller will fallback to running a buildtask in the background.
+  This is less robust, as a failure or error during this process will abort the run.
+
+In either case, the background task will loop over every page in the system, inspecting all external urls and
+checking the status code returned by requesting each one. If a URL returns a response code that is considered
+"broken" (defined as < 200 or > 302) then the `ss-broken` css class will be assigned to that url, and 
+a line item will be added to the report. If a previously broken link has been corrected or fixed, then
+this class is removed.
+
+In the actual report generated the user can click on any broken link item to either view the link in their browser,
+or edit the containing page in the CMS.
+
+While a report is running the current status of this report will be displayed on the report details page, along
+with the status. The user may leave this page and return to it later to view the ongoing status of this report.
+
+Any subsequent report may not be generated until a prior report has completed.
 
 ## Dev task ##
 
 Run the following task *http://path.to.silverstripe/dev/tasks/CheckExternalLinks* to check your site for external
 broken links.
+
+## Queued job ##
+
 If you have the queuedjobs module installed you can set the task to be run every so ofter
-Add the following code to the mysite config to run the job every 24 hours (86400 seconds)
+Add the following yml config to config.yml in mysite/_config have the the task run once every day (86400 seconds)
 
-`Config::inst()->update('CheckExternalLinks', 'QueuedJob', 86400);`
+    CheckExternalLinks:
+      Delay: 86400
 
+## Whitelisting codes ##
 
-## Disable the Broken external link menu
+If you want to ignore or whitelist certain http codes this can be setup via IgnoreCodes in the config.yml
+file in mysite/_config
 
-To disable the *Broken Ext. Links* menu add the following code to mysite/_config.php
-
-`CMSMenu::remove_menu_item('BrokenExternalLinksAdmin');`
-
-## TODO ##
-
-Fix setting the class attribute of broken links to ss-broken
+    CheckExternalLinks:
+      Delay: 60
+      IgnoreCodes:
+        - 401
+        - 403
+        - 501
